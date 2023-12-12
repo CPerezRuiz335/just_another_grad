@@ -6,6 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 class Function(ABC):
+    __slots__ = 'parents', '_name'
+
     def __init__(self):
         self.parents = []
         self._name = type(self).__name__
@@ -36,17 +38,18 @@ class Tensor:
         self, 
         data, 
         requires_grad: bool = False, 
-        fn: Optional[Function] = None, 
-        name: str = ''
-    ):
-        self.data = np.array(data, dtype=np.float32)
-        self.fn = fn
-        self.requires_grad = requires_grad
-        self.name = name
+        fn: Optional[Function] = None
+    ):  
+        if not isinstance(data, np.ndarray):
+            self.data = np.array(data, dtype=np.float32) 
+        else:
+            self.data = data
         if requires_grad:  
-            self.grad = np.zeros(self.data.shape, dtype=self.data.dtype) 
+            self.grad = np.zeros(self.data.shape, dtype=np.float32) 
         else:
             self.grad = None
+        self.fn = fn
+        self.requires_grad = requires_grad
     
     # ***** backprop *****
     def backward(self, retain_graph=False):
@@ -80,9 +83,17 @@ class Tensor:
         return (
             'tensor: ' 
             + np.array2string(self.data, prefix='tensor: ', precision=4) 
-            + (f" fn: {self.fn}" if self.fn else '') 
-            + (f", name: {self.name}" if self.name else '')
+            + (f" fn: {self.fn}" if self.fn else '')
         )
+
+    @property
+    def shape(self):
+        return self.data.shape  
+
+    @property
+    def size(self):
+        return self.data.size
+  
 
     @classmethod
     def comm(cls, function: Function, *tensors) -> Tensor:
@@ -92,5 +103,36 @@ class Tensor:
         requires_grad = any(t.requires_grad for t in operands)
         return cls(data, requires_grad=requires_grad, fn=function)
 
-    def __add__(self, x): return Tensor.comm(ops.Add(), self, x)
+    def __add__(self, x):  return Tensor.comm(ops.Add(), self, x)
     def __radd__(self, x): return Tensor.comm(ops.Add(), x, self)
+    def __sub__(self, x):  return Tensor.comm(ops.Sub(), self, x)
+    def __rsub__(self, x): return Tensor.comm(ops.Sub(), x, self)
+    def __mul__(self, x):  return Tensor.comm(ops.Mul(), self, x)
+    def __rmul__(self, x): return Tensor.comm(ops.Mul(), x, self)
+    def __neg__(self):     return 0.0-self
+
+    def log(self): return Tensor.comm(ops.Log(), self)
+    def exp(self): return Tensor.comm(ops.Exp(), self)
+    def mean(self, axis=None, keepdims=False):
+        return Tensor.comm(ops.Mean(axis, keepdims), self)
+    def sum(self, axis=None, keepdims=False):
+        return Tensor.comm(ops.Sum(axis, keepdims), self)
+    def max(self, axis=None, keepdims=False): 
+        return Tensor.comm(ops.MinMax(axis, keepdims, np.max), self)
+
+    # Ex: 1, 2, 3, 4, 5
+    @property
+    def T(self): 
+        return Tensor.comm(ops.Transpose(), self)
+
+    def __matmul__(self, x):  return Tensor.comm(ops.Matmul(), self, x)
+    def __rmatmul__(self, x): return Tensor.comm(ops.Matmul(), x, self)
+    
+    def relu(self): return Tensor.comm(ops.ReLU(), self) 
+    def log_softmax(self): 
+        tmp = self #  - self.max(axis=1, keepdims=True)
+        return tmp - tmp.exp().sum(axis=1, keepdims=True).log()
+
+    def softmax(self):
+        return Tensor.comm(ops.Softmax(), self)
+
