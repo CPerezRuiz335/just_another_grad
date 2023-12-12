@@ -129,10 +129,7 @@ class Tensor:
     def __rmatmul__(self, x): return Tensor.comm(ops.Matmul(), x, self)
     
     def relu(self): return Tensor.comm(ops.ReLU(), self) 
+
     def log_softmax(self): 
-        tmp = self #  - self.max(axis=1, keepdims=True)
+        tmp = self - self.max(axis=1, keepdims=True)
         return tmp - tmp.exp().sum(axis=1, keepdims=True).log()
-
-    def softmax(self):
-        return Tensor.comm(ops.Softmax(), self)
-
