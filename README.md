@@ -3,6 +3,6 @@
 Unzip data.zip first and install requirements:
 
 ```shell
->>> unzip data.zip && pip3 install -r requirements.txt
+unzip data.zip && pip3 install -r requirements.txt
 ```
-
+For *tests* install PyTorch. 

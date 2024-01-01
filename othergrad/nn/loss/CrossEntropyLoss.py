@@ -2,7 +2,7 @@ from othergrad.tensor import Tensor
 from othergrad.nn.module import Module
 import numpy as np
 from numpy.typing import NDArray
-from typing import Union, Tuple
+
 
 class CrossEntropyLoss(Module):
     def __init__(self):

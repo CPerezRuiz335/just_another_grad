@@ -1,12 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from typing import List, Any, Callable, Optional, overload, Iterator, Tuple
-
-import numpy as np
-from numpy.typing import NDArray
+from typing import List, Any
 
 from othergrad.tensor import Tensor
+
 
 class Module(ABC):
     def __init__(self):
@@ -60,8 +58,8 @@ class Module(ABC):
 
     def __str__(self):
         return (
-            f"{type(self).__name__}\n\t" 
-            + '\n\t'.join([
+            f"{type(self).__name__}\n{' '*4}" 
+            + f"\n{' '*4}".join([
                 f"{name}: {mod}" 
                 for name, mod 
                 in self.__odict__.items() 

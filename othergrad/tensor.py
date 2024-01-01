@@ -74,7 +74,7 @@ class Tensor:
             if not retain_graph: 
                 tensor.fn = None 
 
-        del topo, visited # outsmart garbage collector
+        del topo, visited  # outsmart garbage collector
 
     def __repr__(self):
         return self.__str__()
@@ -94,7 +94,6 @@ class Tensor:
     def size(self):
         return self.data.size
   
-
     @classmethod
     def comm(cls, function: Function, *tensors) -> Tensor:
         operands = [t if isinstance(t, Tensor) else Tensor(t) for t in tensors]
