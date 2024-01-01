@@ -131,5 +131,4 @@ class Tensor:
 
     def log_softmax(self): 
         # Ex: 5 TODO
-        tmp = self - self.max(axis=1, keepdims=True)
-        return tmp - tmp.exp().sum(axis=1, keepdims=True).log()
+        ...

@@ -11,11 +11,8 @@ class Transpose(Function):
 
     def forward(self, t1) -> NDArray:
     	# Ex: 1 TODO
-        self.save_for_backward(t1)
-        return t1.data.T
+        ...
 
     def backward(self, partial: NDArray):
     	# Ex: 1 TODO
-        p = self.parents[0]
-        if p.requires_grad:
-            p.grad += partial.T
+        ...

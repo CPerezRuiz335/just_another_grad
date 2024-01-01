@@ -1,7 +1,6 @@
 import numpy as np
 from tqdm import trange
 import othergrad.nn as nn
-from othergrad import Tensor
 from othergrad.optim import SGD
 from time import sleep
 
@@ -11,7 +10,8 @@ Y_train = np.load("./data/Y_train.npy")
 X_test = np.load("./data/X_test.npy") 
 Y_test = np.load("./data/Y_test.npy") 
 
-# Ex: 6
+
+# Ex: 6 TODO
 class MLP(nn.Module):
     def __init__(self):
         super().__init__()
